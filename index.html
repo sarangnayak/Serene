@@ -1,1 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serene Pomodoro Timer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400&family=Montserrat:wght@100;200;300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Montserrat', sans-serif;
+            --weight-thin: 100;
+            --weight-light: 300;
+            
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+            
+            --focus-color: #6366f1;
+            --short-break-color: #10b981;
+            --long-break-color: #f59e0b;
+            
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            padding: var(--spacing-xl);
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--bg-secondary), var(--bg-primary));
+            z-index: -1;
+        }
+
+        .floating-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            animation: float 20s infinite linear, breath 8s infinite ease-in-out;
+        }
+
+        .header { text-align: center; margin-bottom: var(--spacing-xxl); }
+        .app-title { font-family: var(--font-secondary); font-weight: var(--weight-thin); font-size: 2.5rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: var(--spacing-sm); }
+        .app-subtitle { font-weight: var(--weight-light); font-size: 0.9rem; letter-spacing: 0.1em; color: var(--text-tertiary); text-transform: uppercase; }
+
+        .timer-container { position: relative; width: 300px; height: 300px; margin: 0 auto var(--spacing-xxl); }
+        .timer-circle { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .timer-background { fill: none; stroke: rgba(255, 255, 255, 0.05); stroke-width: 2; }
+        .timer-progress { fill: none; stroke: var(--focus-color); stroke-width: 2; stroke-linecap: round; transition: stroke 0.5s ease; }
+        .timer-content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .timer-display { font-weight: var(--weight-thin); font-size: 4rem; line-height: 1; margin-bottom: var(--spacing-sm); letter-spacing: 0.02em; }
+        .session-label { font-family: var(--font-secondary); font-weight: var(--weight-thin); font-size: 1.1rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+
+        .footer {
+            width: 100%;
+            max-width: 500px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+        
+        .mode-selector { display: flex; justify-content: center; gap: var(--spacing-xxl); }
+        .mode-tab { font-family: var(--font-secondary); font-weight: var(--weight-thin); font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; background: none; border: none; color: var(--text-tertiary); padding: var(--spacing-sm) 0; cursor: pointer; position: relative; transition: color 0.3s ease; }
+        .mode-tab::after { content: ''; position: absolute; bottom: -5px; left: 50%; width: 0; height: 1px; background: currentColor; transition: all 0.3s ease; transform: translateX(-50%); }
+        .mode-tab:hover { color: var(--text-secondary); }
+        .mode-tab.active { color: var(--text-primary); }
+        .mode-tab.active::after { width: 100%; }
+
+        .footer-socials { display: flex; justify-content: center; gap: var(--spacing-lg); }
+        .footer-socials a { color: var(--text-tertiary); font-size: 1.2rem; text-decoration: none; transition: color 0.3s ease, transform 0.3s ease; }
+        .footer-socials a:hover { color: var(--text-primary); transform: translateY(-3px); }
+
+        .controls { display: flex; justify-content: center; align-items: center; gap: var(--spacing-xxl); }
+        .control-btn { border: none; background: none; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 1.5rem; }
+        .control-btn:hover { color: var(--text-primary); transform: scale(1.1); }
+        .control-btn#play-pause-btn { font-size: 2.5rem; }
+
+        .footer-credit { font-size: 0.8rem; font-weight: var(--weight-light); color: var(--text-tertiary); letter-spacing: 0.05em; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 33% { transform: translateY(-20px) rotate(120deg); } 66% { transform: translateY(10px) rotate(240deg); } }
+        @keyframes breath { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        
+        @media (max-width: 480px) { .container { padding: var(--spacing-lg); } .timer-container { width: 250px; height: 250px; } .timer-display { font-size: 3.5rem; } .mode-selector { gap: var(--spacing-md); } }
+    </style>
+</head>
+<body>
+    <div class="background" id="background"></div>
+
+    <div class="container" id="app-container">
+        <header class="header">
+            <h1 class="app-title">Serene</h1>
+            <div class="app-subtitle">Pomodoro Focus Timer</div>
+        </header>
+        <div class="timer-container">
+            <svg class="timer-circle" viewBox="0 0 280 280">
+                <circle class="timer-background" cx="140" cy="140" r="135"></circle>
+                <circle class="timer-progress" cx="140" cy="140" r="135" id="progress-ring"></circle>
+            </svg>
+            <div class="timer-content">
+                <div class="timer-display" id="timer-display">25:00</div>
+                <div class="session-label" id="session-label">Focus Session</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="mode-selector">
+            <button class="mode-tab active" data-mode="focus">Focus</button>
+            <button class="mode-tab" data-mode="short-break">Short Break</button>
+            <button class="mode-tab" data-mode="long-break">Long Break</button>
+        </div>
+        <div class="footer-socials">
+            <a href="#" target="_blank" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="#" target="_blank" aria-label="Hashnode"><i class="fa-brands fa-hashnode"></i></a>
+            <a href="#" target="_blank" aria-label="Dev Community"><i class="fa-brands fa-dev"></i></a>
+            <a href="#" target="_blank" aria-label="Stack Overflow"><i class="fa-brands fa-stack-overflow"></i></a>
+            <a href="#" target="_blank" aria-label="HackerRank"><i class="fa-brands fa-hackerrank"></i></a>
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="prev-btn" aria-label="Previous Mode"><i class="fa-solid fa-backward-fast"></i></button>
+            <button class="control-btn" id="play-pause-btn" aria-label="Play or Pause"><i class="fa-solid fa-play"></i></button>
+            <button class="control-btn" id="next-btn" aria-label="Next Mode"><i class="fa-solid fa-forward-fast"></i></button>
+        </div>
+        <p class="footer-credit">Designed by Sarang Nayak.</p>
+    </footer>
+
+    <audio id="start-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-hint-notification-911.mp3" preload="auto"></audio>
+    <audio id="end-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+
+    <script>
+        class PomodoroTimer {
+            constructor() {
+                this.config = {
+                    focus: { duration: 25 * 60, color: '#6366f1', label: 'Focus Session' },
+                    'short-break': { duration: 5 * 60, color: '#10b981', label: 'Short Break' },
+                    'long-break': { duration: 15 * 60, color: '#f59e0b', label: 'Long Break' }
+                };
+                
+                this.currentMode = 'focus';
+                this.timeLeft = this.config.focus.duration;
+                this.isRunning = false;
+                this.animation = null;
+
+                this.initializeElements();
+                this.createParticles();
+                this.updateDisplay(true);
+                this.setupEventListeners();
+                this.animateIn();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    timerDisplay: document.getElementById('timer-display'),
+                    sessionLabel: document.getElementById('session-label'),
+                    progressRing: document.getElementById('progress-ring'),
+                    playPauseBtn: document.getElementById('play-pause-btn'),
+                    playPauseIcon: document.querySelector('#play-pause-btn i'),
+                    prevBtn: document.getElementById('prev-btn'),
+                    nextBtn: document.getElementById('next-btn'),
+                    modeTabs: document.querySelectorAll('.mode-tab'),
+                    background: document.getElementById('background'),
+                    startSound: document.getElementById('start-sound'),
+                    endSound: document.getElementById('end-sound'),
+                    appContainer: document.getElementById('app-container'),
+                    footer: document.querySelector('.footer')
+                };
+                this.circumference = 2 * Math.PI * this.elements.progressRing.r.baseVal.value;
+                this.elements.progressRing.style.strokeDasharray = this.circumference;
+            }
+
+            createParticles() {
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'floating-particle';
+                    const size = Math.random() * 120 + 40;
+                    Object.assign(particle.style, {
+                        width: `${size}px`, height: `${size}px`,
+                        left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+                        animationDelay: `${Math.random() * 30}s`,
+                        animationDuration: `${Math.random() * 40 + 30}s`
+                    });
+                    this.elements.background.appendChild(particle);
+                }
+            }
+
+            setupEventListeners() {
+                this.elements.playPauseBtn.addEventListener('click', () => this.toggleTimer());
+                this.elements.prevBtn.addEventListener('click', () => this.changeMode(-1));
+                this.elements.nextBtn.addEventListener('click', () => this.changeMode(1));
+                this.elements.modeTabs.forEach(tab => {
+                    tab.addEventListener('click', (e) => this.switchMode(e.target.dataset.mode, true));
+                });
+            }
+
+            animateIn() {
+                gsap.from([this.elements.appContainer, this.elements.footer], {
+                    opacity: 0,
+                    y: 30,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.2,
+                    delay: 0.5
+                });
+            }
+
+            switchMode(mode, isManual = false) {
+                if (this.isRunning && isManual) return;
+                this.pauseTimer();
+                this.isRunning = false;
+                
+                const tl = gsap.timeline({ onComplete: () => this.updateDisplay(true) });
+                tl.to([this.elements.timerDisplay, this.elements.sessionLabel], { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in' })
+                  .call(() => {
+                      this.currentMode = mode;
+                      this.timeLeft = this.config[mode].duration;
+                      this.elements.modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+                      this.elements.progressRing.style.stroke = this.config[mode].color;
+                  })
+                  .set(this.elements.progressRing, { strokeDashoffset: this.circumference })
+                  .to([this.elements.timerDisplay, this.elements.sessionLabel], { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' })
+                  .call(() => {
+                      if (!isManual) this.toggleTimer();
+                  });
+            }
+            
+            changeMode(direction) {
+                if(this.isRunning) return;
+                const modes = ['focus', 'short-break', 'long-break'];
+                let currentIndex = modes.indexOf(this.currentMode);
+                let nextIndex = (currentIndex + direction + modes.length) % modes.length;
+                this.switchMode(modes[nextIndex], true);
+            }
+
+            toggleTimer() {
+                this.isRunning = !this.isRunning;
+                this.elements.playPauseIcon.className = this.isRunning ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+                this.elements.startSound.play();
+                
+                if (this.isRunning) {
+                    this.startTimer();
+                } else {
+                    this.pauseTimer();
+                }
+            }
+
+            startTimer() {
+                const totalTime = this.config[this.currentMode].duration;
+                const elapsed = totalTime - this.timeLeft;
+
+                this.animation = gsap.fromTo(this.elements.progressRing, 
+                    { strokeDashoffset: this.circumference * (1 - (elapsed / totalTime)) },
+                    {
+                        strokeDashoffset: 0,
+                        duration: this.timeLeft,
+                        ease: 'linear',
+                        onUpdate: () => {
+                            this.timeLeft = totalTime * (1 - this.animation.progress());
+                            this.updateDisplay();
+                        },
+                        onComplete: () => this.completeSession()
+                    }
+                );
+            }
+
+            pauseTimer() {
+                if (this.animation) this.animation.pause();
+            }
+
+            completeSession() {
+                this.isRunning = false;
+                this.elements.playPauseIcon.className = 'fa-solid fa-play';
+                this.elements.endSound.play();
+                
+                const nextMode = this.currentMode === 'focus' 
+                    ? 'short-break'
+                    : 'focus';
+                
+                this.switchMode(nextMode, false);
+            }
+            
+            updateDisplay(force = false) {
+                if (!this.isRunning && !force) return;
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = Math.round(this.timeLeft % 60);
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                this.elements.timerDisplay.textContent = timeString;
+                document.title = `${timeString} - ${this.config[this.currentMode].label}`;
+                this.elements.sessionLabel.textContent = this.config[this.currentMode].label;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new PomodoroTimer();
+        });
+    </script>
+</body>
+</html>
