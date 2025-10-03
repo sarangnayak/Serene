@@ -50,3 +50,13 @@ No external dependencies required.
    ```bash
    git clone https://github.com/sarangnayak/Serene.git
    cd Serene
+---
+📂 Project Structure
+Serene/
+├── index.html      # Main structure
+├── style.css       # Styling and layout
+├── script.js       # Pomodoro logic
+├── assets/         # (optional) images, screenshots, sounds
+├── README.md       # Documentation
+└── LICENSE         # License info
+---
