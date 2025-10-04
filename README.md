@@ -30,10 +30,8 @@ It helps you stay productive by breaking your work into focused intervals (Pomod
 
 ## 📸 Screenshot
 
-> *(Add a screenshot or GIF of your app here for better presentation)*  
 
-![Serene Pomodoro Screenshot](./preview.png)  
-<!-- Or use a GIF for demo: ![Demo](./assets/demo.gif) -->
+![Serene Pomodoro Screenshot](./preview.png) 
 
 ---
 
