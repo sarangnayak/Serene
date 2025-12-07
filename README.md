@@ -45,11 +45,39 @@ Serene/
 └── README.md           # This file
 ```
 ---
-🛠️ Technical Details
+## 🛠️ Technical Details
 
-Architecture
-Pure Vanilla JS – No frameworks, no build steps, no package.json
-Modular Functions – Clean separation of concerns (timer logic, UI updates, persistence)
-LocalStorage API – Simple but effective state persistence
-CSS Custom Properties – Easy theming and consistency
+### Architecture
+- **Pure Vanilla JS** – No frameworks, no build steps, no package.json
+- **Modular Functions** – Clean separation of concerns (timer logic, UI updates, persistence)
+- **LocalStorage API** – Simple but effective state persistence
+- **CSS Custom Properties** – Easy theming and consistency
+
+### Key Components
+- **Timer Engine** – RequestAnimationFrame-based countdown with pause/resume
+- **State Manager** – Handles session data and localStorage sync
+- **UI Controller** – Manages DOM updates and user interactions
+- **Persistence Layer** – Auto-saves progress every second
+
+### Browser Support
+- Chrome 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
+
+## 🎯 Use Cases
+- **Personal Productivity** – Daily Pomodoro sessions
+- **Study Sessions** – Focus periods for learning
+- **Code Sprints** – Timed development sessions
+- **Meditation Timer** – Adjustable intervals for mindfulness
+- **UI Reference** – Clean, minimalist design patterns
+
+## 🔧 Development
+
+Want to customize it? Here's where to look:
+
+- **Change timer duration**: Modify `DEFAULT_TIME` in `script.js`
+- **Update colors**: Edit CSS custom properties in `:root` selector in `style.css`
+- **Add notifications**: Implement the `showNotification()` function in `script.js`
+- **Add sound**: Uncomment and implement audio logic in the timer completion handler
 ---
