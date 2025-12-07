@@ -18,7 +18,7 @@
 - **♿ Accessible by Design** – Built with ARIA labels, keyboard navigation, and high contrast
 - **📱 Responsive** – Works beautifully on desktop, tablet, and mobile
 - **🌙 Theme Ready** – Codebase is structured for easy dark/light mode implementation
-
+---
 ## 🚀 Quick Start
 
 1. **Clone the repo**
@@ -33,6 +33,7 @@
 python3 -m http.server 8000
 # Then visit http://localhost:8000
 ```
+---
 📁 Project Structure
 ```
 Serene/
@@ -43,3 +44,12 @@ Serene/
 ├── LICENSE             # MIT License
 └── README.md           # This file
 ```
+---
+🛠️ Technical Details
+
+Architecture
+Pure Vanilla JS – No frameworks, no build steps, no package.json
+Modular Functions – Clean separation of concerns (timer logic, UI updates, persistence)
+LocalStorage API – Simple but effective state persistence
+CSS Custom Properties – Easy theming and consistency
+---
