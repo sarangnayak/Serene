@@ -26,3 +26,20 @@
    git clone https://github.com/sarangnayak/Serene.git
    cd Serene
    ```
+2. That's it! Open index.html in your browser
+
+```bash
+# Or use a simple HTTP server
+python3 -m http.server 8000
+# Then visit http://localhost:8000
+```
+📁 Project Structure
+```
+Serene/
+├── index.html          # Main application entry point
+├── style.css           # All styles (BEM methodology, CSS custom properties)
+├── script.js           # Timer logic, state management, and UI handlers
+├── preview.png         # Project screenshot
+├── LICENSE             # MIT License
+└── README.md           # This file
+```
